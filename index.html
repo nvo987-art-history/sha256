@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>SHA256 GENERATOR</title>
+<title>SHA256 GENERATOR | NVO987</title>
 
 <style>
 body{
@@ -16,38 +16,27 @@ body{
     overflow-x:hidden;
 }
 
-.container{
-    max-width:900px;
-    margin:auto;
-    padding:20px;
-}
-
 h1{
     margin-top:40px;
     font-size:28px;
     text-shadow:0 0 10px #0ff;
 }
 
-/* INFO BOX */
-.info-box{
-    margin:20px auto;
-    max-width:600px;
-    width:100%;
-    text-align:center;
+.info{
+    margin-top:10px;
     font-size:13px;
-    line-height:1.6;
+    line-height:1.5;
 }
 
-/* INPUTS */
 textarea{
-    width:100%;
+    width:85%;
     max-width:600px;
     height:120px;
     padding:14px;
     background:#000;
     border:1px solid #0ff;
     color:#0ff;
-    margin-top:20px;
+    margin-top:25px;
     outline:none;
     box-sizing:border-box;
 }
@@ -55,29 +44,26 @@ textarea:focus{
     box-shadow:0 0 10px #0ff;
 }
 
-input[type="file"]{
-    margin-top:20px;
-    color:#0ff;
-}
-
 button{
     margin-top:15px;
-    padding:10px 20px;
+    padding:12px 25px;
     background:#0ff;
     border:none;
     cursor:pointer;
     font-weight:bold;
 }
 button:hover{
-    box-shadow:0 0 10px #0ff;
+    box-shadow:0 0 15px #0ff;
 }
 
-/* RESULT */
+.file-btn{
+    margin-top:15px;
+}
+
 #result{
     margin:30px auto;
-    width:100%;
-    max-width:800px;
-    text-align:left;
+    width:85%;
+    max-width:700px;
     padding:20px;
     border:1px solid #0ff;
     background:#000;
@@ -85,65 +71,44 @@ button:hover{
     box-sizing:border-box;
 }
 
-pre{
-    background:#111;
-    padding:15px;
-    overflow:auto;
-    font-size:12px;
-    word-break:break-all;
-}
+.ok{ color:#00ff88; }
+.err{ color:#ff0040; }
 
-.small-btn{
-    margin-top:10px;
-    margin-right:10px;
-    padding:6px 12px;
-    font-size:12px;
-}
-
-/* FOOTER */
 footer{
-    margin-top:40px;
-    padding:20px;
+    margin-top:60px;
+    margin-bottom:30px;
     font-size:12px;
     color:#0ff;
-    border-top:1px solid #0ff;
-    line-height:1.6;
-}
-
-/* MOBILE FIX */
-@media(max-width:600px){
-    body{
-        text-align:center;
-    }
+    opacity:0.7;
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-
 <h1>SHA256 GENERATOR</h1>
 
-<div class="info-box">
-<b>INPUT:</b> Text or File<br>
-<b>FEATURES:</b> real SHA256 hash, download bundle<br>
-<b>NOTE:</b> local processing only — no upload, no tracking
+<div class="info">
+INPUT: Text or File<br>
+FEATURES: real SHA256 hash, download bundle<br>
+NOTE: local processing only — no upload, no tracking
 </div>
 
 <textarea id="text" placeholder="Enter text (optional)"></textarea>
 
 <br>
 
-<input type="file" id="file">
+<input type="file" id="file" hidden>
+<button class="file-btn" onclick="document.getElementById('file').click()">
+SELECT FILE
+</button>
+
+<div id="filename" style="margin-top:8px;font-size:12px;"></div>
 
 <br>
-
 <button onclick="generate()">GENERATE</button>
 
 <div id="result"></div>
-
-</div>
 
 <footer>
 NVO987<br>
@@ -154,93 +119,87 @@ did:web:identity.nvo987.us
 
 <script>
 
-// SHA256 (real)
-async function sha256(buffer){
-    const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
-    return Array.from(new Uint8Array(hashBuffer))
-        .map(b=>b.toString(16).padStart(2,"0"))
-        .join("");
+let currentHash = "";
+let currentText = "";
+let currentFileName = "data.txt";
+
+/* FILE NAME SHOW */
+document.getElementById("file").addEventListener("change", e=>{
+    document.getElementById("filename").innerText =
+        e.target.files[0]?.name || "";
+});
+
+/* SHA256 */
+async function sha256(text){
+    const encoder = new TextEncoder();
+    const data = encoder.encode(text);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2,"0")).join("");
 }
 
+/* GENERATE */
 async function generate(){
 
     const text = document.getElementById("text").value;
-    const fileInput = document.getElementById("file");
+    const file = document.getElementById("file").files[0];
     const result = document.getElementById("result");
 
-    if(!text && !fileInput.files.length){
-        result.innerHTML = "❌ No input provided";
+    let content = "";
+
+    if(file){
+        content = await file.text();
+        currentFileName = file.name;
+    }else if(text){
+        content = text;
+        currentFileName = "text.txt";
+    }else{
+        result.innerHTML = "<div class='err'>No input provided</div>";
         return;
     }
 
-    result.innerHTML = "Generating hash...";
+    const hash = await sha256(content);
 
-    let buffer;
-    let name = "data.txt";
-
-    if(fileInput.files.length){
-        const file = fileInput.files[0];
-        buffer = await file.arrayBuffer();
-        name = file.name;
-    }else{
-        buffer = new TextEncoder().encode(text);
-    }
-
-    const hash = await sha256(buffer);
+    currentHash = hash;
+    currentText = content;
 
     result.innerHTML = `
-    <div>✔ SHA256 generated</div>
-    <pre>${hash}</pre>
-
-    <button class="small-btn" onclick="copyText('${hash}')">COPY HASH</button>
-    <button class="small-btn" onclick="downloadBundle('${hash}', ${JSON.stringify(text)}, '${name}')">DOWNLOAD</button>
+        <div class="ok">✔ SHA256 generated</div>
+        <div style="background:#111;padding:12px;margin-top:10px;word-break:break-all;">
+            ${hash}
+        </div>
+        <button onclick="copyHash()">COPY HASH</button>
+        <button onclick="downloadFile()">DOWNLOAD</button>
     `;
 }
 
-// COPY
-function copyText(text){
-    navigator.clipboard.writeText(text);
-    showToast("Copied");
+/* COPY */
+function copyHash(){
+    navigator.clipboard.writeText(currentHash);
 }
 
-// DOWNLOAD
-function downloadBundle(hash, text, name){
+/* DOWNLOAD FIX */
+function downloadFile(){
 
-    const content = 
-`SHA256: ${hash}
+    const data = {
+        sha256: currentHash,
+        content: currentText
+    };
 
-FILE: ${name}
+    const blob = new Blob(
+        [JSON.stringify(data, null, 2)],
+        {type: "application/json"}
+    );
 
-CONTENT:
-${text || "[binary file]"}
-`;
-
-    const blob = new Blob([content], {type:"text/plain"});
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "sha256_bundle.txt";
+    a.download = "sha256_bundle.json";
     a.click();
-}
 
-// TOAST
-function showToast(msg){
-    const t = document.createElement("div");
-    t.innerText = msg;
-    t.style.position = "fixed";
-    t.style.bottom = "20px";
-    t.style.left = "50%";
-    t.style.transform = "translateX(-50%)";
-    t.style.background = "#0ff";
-    t.style.color = "#000";
-    t.style.padding = "8px 16px";
-    t.style.fontSize = "12px";
-    t.style.zIndex = "999";
-    document.body.appendChild(t);
-
-    setTimeout(()=>t.remove(),1500);
+    URL.revokeObjectURL(a.href);
 }
 
 </script>
 
 </body>
-  </html>
+</html>
