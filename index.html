@@ -6,6 +6,9 @@
 
 <title>SHA256 GENERATOR | NVO987</title>
 
+<!-- JSZIP -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
 <style>
 body{
     margin:0;
@@ -56,8 +59,9 @@ button:hover{
     box-shadow:0 0 15px #0ff;
 }
 
-.file-btn{
-    margin-top:15px;
+#filename{
+    margin-top:8px;
+    font-size:12px;
 }
 
 #result{
@@ -90,7 +94,7 @@ footer{
 
 <div class="info">
 INPUT: Text or File<br>
-FEATURES: real SHA256 hash, download bundle<br>
+FEATURES: real SHA256 hash, ZIP bundle download<br>
 NOTE: local processing only — no upload, no tracking
 </div>
 
@@ -99,13 +103,15 @@ NOTE: local processing only — no upload, no tracking
 <br>
 
 <input type="file" id="file" hidden>
-<button class="file-btn" onclick="document.getElementById('file').click()">
+
+<button onclick="document.getElementById('file').click()">
 SELECT FILE
 </button>
 
-<div id="filename" style="margin-top:8px;font-size:12px;"></div>
+<div id="filename"></div>
 
 <br>
+
 <button onclick="generate()">GENERATE</button>
 
 <div id="result"></div>
@@ -120,13 +126,13 @@ did:web:identity.nvo987.us
 <script>
 
 let currentHash = "";
-let currentText = "";
-let currentFileName = "data.txt";
+let currentContent = "";
+let currentFileName = "";
 
-/* FILE NAME SHOW */
+/* SHOW FILE NAME */
 document.getElementById("file").addEventListener("change", e=>{
-    document.getElementById("filename").innerText =
-        e.target.files[0]?.name || "";
+    const file = e.target.files[0];
+    document.getElementById("filename").innerText = file ? file.name : "";
 });
 
 /* SHA256 */
@@ -141,27 +147,29 @@ async function sha256(text){
 /* GENERATE */
 async function generate(){
 
-    const text = document.getElementById("text").value;
+    const text = document.getElementById("text").value.trim();
     const file = document.getElementById("file").files[0];
     const result = document.getElementById("result");
+
+    if(!text && !file){
+        result.innerHTML = "<div class='err'>No input provided</div>";
+        return;
+    }
 
     let content = "";
 
     if(file){
         content = await file.text();
         currentFileName = file.name;
-    }else if(text){
-        content = text;
-        currentFileName = "text.txt";
     }else{
-        result.innerHTML = "<div class='err'>No input provided</div>";
-        return;
+        content = text;
+        currentFileName = "input.txt";
     }
 
     const hash = await sha256(content);
 
     currentHash = hash;
-    currentText = content;
+    currentContent = content;
 
     result.innerHTML = `
         <div class="ok">✔ SHA256 generated</div>
@@ -169,7 +177,7 @@ async function generate(){
             ${hash}
         </div>
         <button onclick="copyHash()">COPY HASH</button>
-        <button onclick="downloadFile()">DOWNLOAD</button>
+        <button onclick="downloadZIP()">DOWNLOAD ZIP</button>
     `;
 }
 
@@ -178,22 +186,23 @@ function copyHash(){
     navigator.clipboard.writeText(currentHash);
 }
 
-/* DOWNLOAD FIX */
-function downloadFile(){
+/* ZIP DOWNLOAD */
+async function downloadZIP(){
 
-    const data = {
-        sha256: currentHash,
-        content: currentText
-    };
+    const zip = new JSZip();
 
-    const blob = new Blob(
-        [JSON.stringify(data, null, 2)],
-        {type: "application/json"}
-    );
+    // HASH FILE
+    zip.file("sha256.txt", currentHash);
+
+    // ORIGINAL FILE
+    zip.file(currentFileName, currentContent);
+
+    // GENERATE ZIP
+    const blob = await zip.generateAsync({type:"blob"});
 
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "sha256_bundle.json";
+    a.download = "sha256_bundle.zip";
     a.click();
 
     URL.revokeObjectURL(a.href);
