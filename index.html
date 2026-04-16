@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SHA256 GENERATOR</title>
+
+<style>
+body{
+    margin:0;
+    background:#050505;
+    font-family:monospace;
+    color:#0ff;
+    text-align:center;
+    overflow-x:hidden;
+}
+
+.container{
+    max-width:900px;
+    margin:auto;
+    padding:20px;
+}
+
+h1{
+    margin-top:40px;
+    font-size:28px;
+    text-shadow:0 0 10px #0ff;
+}
+
+/* INFO BOX */
+.info-box{
+    margin:20px auto;
+    max-width:600px;
+    width:100%;
+    text-align:center;
+    font-size:13px;
+    line-height:1.6;
+}
+
+/* INPUTS */
+textarea{
+    width:100%;
+    max-width:600px;
+    height:120px;
+    padding:14px;
+    background:#000;
+    border:1px solid #0ff;
+    color:#0ff;
+    margin-top:20px;
+    outline:none;
+    box-sizing:border-box;
+}
+textarea:focus{
+    box-shadow:0 0 10px #0ff;
+}
+
+input[type="file"]{
+    margin-top:20px;
+    color:#0ff;
+}
+
+button{
+    margin-top:15px;
+    padding:10px 20px;
+    background:#0ff;
+    border:none;
+    cursor:pointer;
+    font-weight:bold;
+}
+button:hover{
+    box-shadow:0 0 10px #0ff;
+}
+
+/* RESULT */
+#result{
+    margin:30px auto;
+    width:100%;
+    max-width:800px;
+    text-align:left;
+    padding:20px;
+    border:1px solid #0ff;
+    background:#000;
+    box-shadow:0 0 10px #0ff;
+    box-sizing:border-box;
+}
+
+pre{
+    background:#111;
+    padding:15px;
+    overflow:auto;
+    font-size:12px;
+    word-break:break-all;
+}
+
+.small-btn{
+    margin-top:10px;
+    margin-right:10px;
+    padding:6px 12px;
+    font-size:12px;
+}
+
+/* FOOTER */
+footer{
+    margin-top:40px;
+    padding:20px;
+    font-size:12px;
+    color:#0ff;
+    border-top:1px solid #0ff;
+    line-height:1.6;
+}
+
+/* MOBILE FIX */
+@media(max-width:600px){
+    body{
+        text-align:center;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>SHA256 GENERATOR</h1>
+
+<div class="info-box">
+<b>INPUT:</b> Text or File<br>
+<b>FEATURES:</b> real SHA256 hash, download bundle<br>
+<b>NOTE:</b> local processing only — no upload, no tracking
+</div>
+
+<textarea id="text" placeholder="Enter text (optional)"></textarea>
+
+<br>
+
+<input type="file" id="file">
+
+<br>
+
+<button onclick="generate()">GENERATE</button>
+
+<div id="result"></div>
+
+</div>
+
+<footer>
+NVO987<br>
+Nicholas Van-Orton<br>
+© 2026<br>
+did:web:identity.nvo987.us
+</footer>
+
+<script>
+
+// SHA256 (real)
+async function sha256(buffer){
+    const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
+    return Array.from(new Uint8Array(hashBuffer))
+        .map(b=>b.toString(16).padStart(2,"0"))
+        .join("");
+}
+
+async function generate(){
+
+    const text = document.getElementById("text").value;
+    const fileInput = document.getElementById("file");
+    const result = document.getElementById("result");
+
+    if(!text && !fileInput.files.length){
+        result.innerHTML = "❌ No input provided";
+        return;
+    }
+
+    result.innerHTML = "Generating hash...";
+
+    let buffer;
+    let name = "data.txt";
+
+    if(fileInput.files.length){
+        const file = fileInput.files[0];
+        buffer = await file.arrayBuffer();
+        name = file.name;
+    }else{
+        buffer = new TextEncoder().encode(text);
+    }
+
+    const hash = await sha256(buffer);
+
+    result.innerHTML = `
+    <div>✔ SHA256 generated</div>
+    <pre>${hash}</pre>
+
+    <button class="small-btn" onclick="copyText('${hash}')">COPY HASH</button>
+    <button class="small-btn" onclick="downloadBundle('${hash}', ${JSON.stringify(text)}, '${name}')">DOWNLOAD</button>
+    `;
+}
+
+// COPY
+function copyText(text){
+    navigator.clipboard.writeText(text);
+    showToast("Copied");
+}
+
+// DOWNLOAD
+function downloadBundle(hash, text, name){
+
+    const content = 
+`SHA256: ${hash}
+
+FILE: ${name}
+
+CONTENT:
+${text || "[binary file]"}
+`;
+
+    const blob = new Blob([content], {type:"text/plain"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "sha256_bundle.txt";
+    a.click();
+}
+
+// TOAST
+function showToast(msg){
+    const t = document.createElement("div");
+    t.innerText = msg;
+    t.style.position = "fixed";
+    t.style.bottom = "20px";
+    t.style.left = "50%";
+    t.style.transform = "translateX(-50%)";
+    t.style.background = "#0ff";
+    t.style.color = "#000";
+    t.style.padding = "8px 16px";
+    t.style.fontSize = "12px";
+    t.style.zIndex = "999";
+    document.body.appendChild(t);
+
+    setTimeout(()=>t.remove(),1500);
+}
+
+</script>
+
+</body>
+  </html>
