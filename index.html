@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>SHA256 GENERATOR | NVO987 | Nicholas Van-Orton</title>
+<title>SHA256 GENERATOR</title>
 
-<!-- JSZIP -->
+<!-- JSZip (third-party via CDN) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
 <style>
@@ -16,7 +16,6 @@ body{
     font-family:monospace;
     color:#0ff;
     text-align:center;
-    overflow-x:hidden;
 }
 
 h1{
@@ -28,7 +27,10 @@ h1{
 .info{
     margin-top:10px;
     font-size:13px;
-    line-height:1.5;
+    line-height:1.6;
+    max-width:700px;
+    margin-left:auto;
+    margin-right:auto;
 }
 
 textarea{
@@ -40,11 +42,6 @@ textarea{
     border:1px solid #0ff;
     color:#0ff;
     margin-top:25px;
-    outline:none;
-    box-sizing:border-box;
-}
-textarea:focus{
-    box-shadow:0 0 10px #0ff;
 }
 
 button{
@@ -55,14 +52,6 @@ button{
     cursor:pointer;
     font-weight:bold;
 }
-button:hover{
-    box-shadow:0 0 15px #0ff;
-}
-
-#filename{
-    margin-top:8px;
-    font-size:12px;
-}
 
 #result{
     margin:30px auto;
@@ -71,8 +60,6 @@ button:hover{
     padding:20px;
     border:1px solid #0ff;
     background:#000;
-    box-shadow:0 0 10px #0ff;
-    box-sizing:border-box;
 }
 
 .ok{ color:#00ff88; }
@@ -84,6 +71,9 @@ footer{
     font-size:12px;
     color:#0ff;
     opacity:0.7;
+    max-width:700px;
+    margin-left:auto;
+    margin-right:auto;
 }
 </style>
 </head>
@@ -94,8 +84,18 @@ footer{
 
 <div class="info">
 INPUT: Text or File<br>
-FEATURES: real SHA256 hash, ZIP bundle download<br>
-NOTE: local processing only — no upload, no tracking
+FEATURES: SHA-256 hashing, ZIP export<br><br>
+
+<b>INFO:</b><br>
+Processing is performed locally in your browser.<br>
+No input data is transmitted to any server.<br><br>
+
+<b>NOTICE:</b><br>
+This tool uses a third-party library (JSZip) delivered via a CDN.<br><br>
+
+<b>DISCLAIMER:</b><br>
+Users are responsible for the content they process.<br>
+Do not use confidential, personal, or copyrighted material without permission.
 </div>
 
 <textarea id="text" placeholder="Enter text (optional)"></textarea>
@@ -117,10 +117,8 @@ SELECT FILE
 <div id="result"></div>
 
 <footer>
-NVO987<br>
-Nicholas Van-Orton<br>
-© 2026<br>
-did:web:identity.nvo987.us
+© 2026 — NVO987<br>
+SHA256 Utility Tool
 </footer>
 
 <script>
@@ -129,9 +127,16 @@ let currentHash = "";
 let currentContent = "";
 let currentFileName = "";
 
-/* SHOW FILE NAME */
+/* FILE SELECT */
 document.getElementById("file").addEventListener("change", e=>{
     const file = e.target.files[0];
+
+    if(file && file.size > 5 * 1024 * 1024){
+        alert("File too large (max 5MB)");
+        e.target.value = "";
+        return;
+    }
+
     document.getElementById("filename").innerText = file ? file.name : "";
 });
 
@@ -140,8 +145,9 @@ async function sha256(text){
     const encoder = new TextEncoder();
     const data = encoder.encode(text);
     const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2,"0")).join("");
+    return Array.from(new Uint8Array(hashBuffer))
+        .map(b => b.toString(16).padStart(2,"0"))
+        .join("");
 }
 
 /* GENERATE */
@@ -155,6 +161,8 @@ async function generate(){
         result.innerHTML = "<div class='err'>No input provided</div>";
         return;
     }
+
+    result.innerHTML = "Processing...";
 
     let content = "";
 
@@ -172,7 +180,7 @@ async function generate(){
     currentContent = content;
 
     result.innerHTML = `
-        <div class="ok">✔ SHA256 generated</div>
+        <div class="ok">✔ SHA-256 generated</div>
         <div style="background:#111;padding:12px;margin-top:10px;word-break:break-all;">
             ${hash}
         </div>
@@ -186,18 +194,14 @@ function copyHash(){
     navigator.clipboard.writeText(currentHash);
 }
 
-/* ZIP DOWNLOAD */
+/* ZIP */
 async function downloadZIP(){
 
     const zip = new JSZip();
 
-    // HASH FILE
     zip.file("sha256.txt", currentHash);
-
-    // ORIGINAL FILE
     zip.file(currentFileName, currentContent);
 
-    // GENERATE ZIP
     const blob = await zip.generateAsync({type:"blob"});
 
     const a = document.createElement("a");
