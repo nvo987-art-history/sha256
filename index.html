@@ -6,7 +6,7 @@
 
 <title>SHA256 GENERATOR</title>
 
-<!-- JSZip (third-party via CDN) -->
+<!-- JSZip (MIT) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
 <style>
@@ -14,14 +14,14 @@ body{
     margin:0;
     background:#050505;
     font-family:monospace;
-    color:#0ff;
+    color:#00e6a8;
     text-align:center;
 }
 
 h1{
     margin-top:40px;
     font-size:28px;
-    text-shadow:0 0 10px #0ff;
+    text-shadow:0 0 6px #00e6a8;
 }
 
 .info{
@@ -31,6 +31,7 @@ h1{
     max-width:700px;
     margin-left:auto;
     margin-right:auto;
+    color:#7fffd4;
 }
 
 textarea{
@@ -39,15 +40,16 @@ textarea{
     height:120px;
     padding:14px;
     background:#000;
-    border:1px solid #0ff;
-    color:#0ff;
+    border:1px solid #00b386;
+    color:#ccfff5;
     margin-top:25px;
 }
 
 button{
     margin-top:15px;
     padding:12px 25px;
-    background:#0ff;
+    background:#007a5a;
+    color:#fff;
     border:none;
     cursor:pointer;
     font-weight:bold;
@@ -58,18 +60,17 @@ button{
     width:85%;
     max-width:700px;
     padding:20px;
-    border:1px solid #0ff;
+    border:1px solid #00b386;
     background:#000;
 }
 
-.ok{ color:#00ff88; }
-.err{ color:#ff0040; }
+.ok{ color:#00ff9c; }
+.err{ color:#ff4d6d; }
 
 footer{
     margin-top:60px;
     margin-bottom:30px;
     font-size:12px;
-    color:#0ff;
     opacity:0.7;
     max-width:700px;
     margin-left:auto;
@@ -86,19 +87,24 @@ footer{
 INPUT: Text or File<br>
 FEATURES: SHA-256 hashing, ZIP export<br><br>
 
+<b>IMPORTANT:</b><br>
+Text input is encoded as UTF-8.<br>
+File hashing is performed on raw binary data.<br>
+Results may differ for the same visible content.<br><br>
+
 <b>INFO:</b><br>
 Processing is performed locally in your browser.<br>
 No input data is transmitted to any server.<br><br>
 
 <b>NOTICE:</b><br>
-This tool uses a third-party library (JSZip) delivered via a CDN.<br><br>
+This tool uses a third-party library (JSZip) under MIT License.<br><br>
 
 <b>DISCLAIMER:</b><br>
 Users are responsible for the content they process.<br>
-Do not use confidential, personal, or copyrighted material without permission.
+Do not use confidential or copyrighted material without permission.
 </div>
 
-<textarea id="text" placeholder="Enter text (optional)"></textarea>
+<textarea id="text" placeholder="Enter text (UTF-8 encoded)"></textarea>
 
 <br>
 
@@ -131,8 +137,8 @@ let currentFileName = "";
 document.getElementById("file").addEventListener("change", e=>{
     const file = e.target.files[0];
 
-    if(file && file.size > 5 * 1024 * 1024){
-        alert("File too large (max 5MB)");
+    if(file && file.size > 50 * 1024 * 1024){
+        alert("File too large (max 50MB)");
         e.target.value = "";
         return;
     }
@@ -140,12 +146,24 @@ document.getElementById("file").addEventListener("change", e=>{
     document.getElementById("filename").innerText = file ? file.name : "";
 });
 
-/* SHA256 */
-async function sha256(text){
+/* SHA256 TEXT */
+async function sha256Text(text){
     const encoder = new TextEncoder();
     const data = encoder.encode(text);
     const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-    return Array.from(new Uint8Array(hashBuffer))
+    return toHex(hashBuffer);
+}
+
+/* SHA256 FILE (binary-safe) */
+async function sha256File(file){
+    const buffer = await file.arrayBuffer();
+    const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
+    return toHex(hashBuffer);
+}
+
+/* HEX CONVERT */
+function toHex(buffer){
+    return Array.from(new Uint8Array(buffer))
         .map(b => b.toString(16).padStart(2,"0"))
         .join("");
 }
@@ -153,7 +171,7 @@ async function sha256(text){
 /* GENERATE */
 async function generate(){
 
-    const text = document.getElementById("text").value.trim();
+    const text = document.getElementById("text").value;
     const file = document.getElementById("file").files[0];
     const result = document.getElementById("result");
 
@@ -164,20 +182,19 @@ async function generate(){
 
     result.innerHTML = "Processing...";
 
-    let content = "";
+    let hash = "";
 
     if(file){
-        content = await file.text();
         currentFileName = file.name;
+        hash = await sha256File(file);
+        currentContent = "[binary file]";
     }else{
-        content = text;
         currentFileName = "input.txt";
+        currentContent = text;
+        hash = await sha256Text(text);
     }
 
-    const hash = await sha256(content);
-
     currentHash = hash;
-    currentContent = content;
 
     result.innerHTML = `
         <div class="ok">✔ SHA-256 generated</div>
