@@ -1,0 +1,1431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>SHA256 Generator | Local SHA-256 Hash Utility | NVO987</title>
+
+  <meta name="description" content="NVO987 is a multidisciplinary artistic and cultural initiative exploring the intersections of visual culture and art history. SHA256 Generator is a browser-based utility for generating SHA-256 hashes locally. Hash text or files, verify integrity, and export verification bundles without uploading or transmitting data.">
+
+  <meta name="keywords" content="NVO987,SHA256,SHA-256,Hash Generator,Checksum,Cryptography,Integrity Verification,Web Crypto API,File Hash,Text Hash,Digital Integrity,Verification Tool,Browser Security">
+
+  <meta name="author" content="NVO987 – Culture Visuelle Moderne et Contemporaine">
+  <meta name="creator" content="NVO987 – Culture Visuelle Moderne et Contemporaine">
+  <meta name="version" content="1.0">
+
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+  <meta name="theme-color" content="#111312">
+  <meta name="color-scheme" content="light">
+
+  <link rel="canonical" href="https://sha256.nvo987.us/">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="NVO987">
+  <meta property="og:title" content="SHA256 Generator | Local SHA-256 Hash Utility">
+  <meta property="og:description" content="Generate SHA-256 hashes locally in your browser. No uploads, no tracking, browser-side processing only.">
+  <meta property="og:url" content="https://sha256.nvo987.us/">
+  <meta property="og:locale" content="en_US">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="SHA256 Generator">
+  <meta name="twitter:description" content="Browser-based SHA-256 hashing utility powered by the Web Crypto API.">
+
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="me" href="https://identity.nvo987.us">
+
+  <meta name="did" content="did:web:identity.nvo987.us">
+  <meta name="machine-readable" content="true">
+  <meta name="ai-compatible" content="true">
+  <meta name="semantic-layer" content="enabled">
+
+  <link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/apple-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/apple-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/apple-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/apple-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-icon-180x180.png">
+
+  <link rel="icon" type="image/png" sizes="192x192" href="/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+
+  <link rel="manifest" href="/manifest.json">
+
+  <meta name="msapplication-TileColor" content="#f4f0e8">
+  <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap"
+    rel="stylesheet"
+  >
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+  <style>
+    /* =========================================================
+       NVO987 — SHA-256
+       COMPLETE REBUILT DESIGN SYSTEM
+       ========================================================= */
+
+    :root {
+      --canvas: #f3efe7;
+      --canvas-soft: #faf8f3;
+      --surface: #fffdf8;
+      --surface-muted: #ebe5da;
+
+      --ink: #121514;
+      --ink-soft: #515852;
+      --ink-muted: #777d77;
+
+      --accent: #9b7650;
+      --accent-light: #c7a87e;
+      --accent-dark: #6e5136;
+
+      --line: rgba(18, 21, 20, 0.12);
+      --line-strong: rgba(18, 21, 20, 0.22);
+
+      --success: #28684f;
+      --danger: #a34040;
+
+      --serif: "Playfair Display", Georgia, serif;
+      --sans: "Inter", Arial, sans-serif;
+      --mono: "DM Mono", ui-monospace, monospace;
+
+      --radius-sm: 10px;
+      --radius-md: 18px;
+      --radius-lg: 28px;
+
+      --shadow-card:
+        0 1px 1px rgba(18, 21, 20, 0.03),
+        0 18px 50px rgba(18, 21, 20, 0.08);
+
+      --shadow-hover:
+        0 28px 70px rgba(18, 21, 20, 0.14);
+
+      --ease: cubic-bezier(.22, 1, .36, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-width: 320px;
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 90% 8%, rgba(155, 118, 80, 0.10), transparent 22rem),
+        linear-gradient(180deg, #161918 0 27rem, var(--canvas) 27rem 100%);
+      font-family: var(--sans);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.18;
+      background-image:
+        linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
+      background-size: 5px 5px;
+      mix-blend-mode: overlay;
+    }
+
+    button,
+    textarea,
+    input {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 4px;
+    }
+
+    /* =========================================================
+       SITE SHELL
+       ========================================================= */
+
+    .site-shell {
+      width: min(100%, 1400px);
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* =========================================================
+       HEADER
+       ========================================================= */
+
+    .site-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 24px 0;
+      color: #f6f1e7;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-mark {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(199, 168, 126, 0.75);
+      border-radius: 50%;
+      color: var(--accent-light);
+      font-family: var(--serif);
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .brand-copy {
+      display: grid;
+      gap: 3px;
+    }
+
+    .brand-name {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+    }
+
+    .brand-subtitle {
+      color: rgba(246, 241, 231, 0.58);
+      font-size: 0.62rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .header-meta {
+      padding: 9px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      color: rgba(246, 241, 231, 0.68);
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+    }
+
+    /* =========================================================
+       HERO
+       ========================================================= */
+
+    .hero {
+      padding: 42px 0 120px;
+      color: #f7f2e8;
+    }
+
+    .eyebrow,
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0;
+      color: var(--accent);
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 34px;
+      height: 1px;
+      background: currentColor;
+    }
+
+    .hero-grid {
+      margin-top: 28px;
+    }
+
+    .hero-title {
+      max-width: 980px;
+      margin: 0;
+      font-family: var(--serif);
+      font-size: clamp(3.8rem, 10vw, 9rem);
+      font-weight: 500;
+      letter-spacing: -0.065em;
+      line-height: 0.86;
+    }
+
+    .hero-title em {
+      color: var(--accent-light);
+    }
+
+    .hero-description {
+      max-width: 610px;
+      margin: 34px 0 0;
+      color: rgba(247, 242, 232, 0.68);
+      font-size: clamp(1rem, 2vw, 1.18rem);
+      line-height: 1.8;
+    }
+
+    .hero-rule {
+      width: 100%;
+      height: 1px;
+      margin-top: 70px;
+      background: linear-gradient(
+        90deg,
+        rgba(199, 168, 126, 0.7),
+        rgba(255,255,255,0.1),
+        transparent
+      );
+    }
+
+    /* =========================================================
+       WORKSPACE
+       ========================================================= */
+
+    .workspace {
+      display: grid;
+      gap: 28px;
+      margin-top: -72px;
+      padding-bottom: 90px;
+    }
+
+    .panel {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: rgba(255, 253, 248, 0.9);
+      box-shadow: var(--shadow-card);
+      backdrop-filter: blur(14px);
+    }
+
+    .panel::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto;
+      height: 3px;
+      background: linear-gradient(
+        90deg,
+        var(--accent-dark),
+        var(--accent-light),
+        transparent
+      );
+      opacity: 0.85;
+    }
+
+    .panel-header {
+      padding: 32px 28px 8px;
+    }
+
+    .section-label {
+      margin-bottom: 10px;
+    }
+
+    .panel-title {
+      margin: 0;
+      font-family: var(--serif);
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 500;
+      letter-spacing: -0.045em;
+      line-height: 1;
+    }
+
+    /* =========================================================
+       TOOL
+       ========================================================= */
+
+    .tool-panel {
+      transition:
+        transform 300ms var(--ease),
+        box-shadow 300ms var(--ease);
+    }
+
+    .tool-panel:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .input-area {
+      padding: 28px;
+    }
+
+    textarea {
+      display: block;
+      width: 100%;
+      min-height: 240px;
+      padding: 22px;
+      resize: vertical;
+
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+
+      background:
+        linear-gradient(rgba(18, 21, 20, 0.018) 1px, transparent 1px),
+        var(--canvas-soft);
+      background-size: 100% 2rem;
+
+      color: var(--ink);
+      line-height: 2rem;
+
+      transition:
+        border-color 220ms var(--ease),
+        box-shadow 220ms var(--ease),
+        background 220ms var(--ease);
+    }
+
+    textarea::placeholder {
+      color: var(--ink-muted);
+    }
+
+    textarea:hover {
+      border-color: var(--line-strong);
+    }
+
+    textarea:focus {
+      border-color: var(--accent);
+      background-color: #fffefa;
+      box-shadow: 0 0 0 5px rgba(155, 118, 80, 0.1);
+      outline: none;
+    }
+
+    .divider-label {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 26px 0;
+      color: var(--ink-muted);
+      font-family: var(--mono);
+      font-size: 0.64rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .divider-label::before,
+    .divider-label::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--line);
+    }
+
+    .file-zone {
+      display: grid;
+      gap: 20px;
+      padding: 22px;
+
+      border: 1px dashed rgba(155, 118, 80, 0.55);
+      border-radius: var(--radius-md);
+
+      background:
+        linear-gradient(135deg, rgba(155, 118, 80, 0.08), transparent 60%);
+    }
+
+    .file-zone-copy {
+      display: grid;
+      gap: 6px;
+    }
+
+    .file-zone-title {
+      font-family: var(--serif);
+      font-size: 1.35rem;
+    }
+
+    .file-zone-description {
+      color: var(--ink-soft);
+      font-size: 0.88rem;
+      line-height: 1.65;
+    }
+
+    #filename {
+      width: 100%;
+      margin-top: 14px;
+      color: var(--ink-soft);
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      overflow-wrap: anywhere;
+    }
+
+    #filename:not(:empty) {
+      padding: 13px 15px;
+      border-radius: var(--radius-sm);
+      background: var(--surface-muted);
+    }
+
+    /* =========================================================
+       BUTTONS
+       ========================================================= */
+
+    .button-row,
+    .result-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .button-row {
+      padding: 0 28px;
+    }
+
+    button {
+      min-height: 50px;
+      padding: 0 20px;
+
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+
+      transition:
+        transform 220ms var(--ease),
+        background 220ms var(--ease),
+        color 220ms var(--ease),
+        border-color 220ms var(--ease),
+        box-shadow 220ms var(--ease);
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .button-primary,
+    #generate-button {
+      flex: 1 1 190px;
+      background: var(--ink);
+      color: #f7f2e8;
+      box-shadow: 0 10px 24px rgba(18, 21, 20, 0.12);
+    }
+
+    .button-primary:hover,
+    #generate-button:hover {
+      background: var(--accent-dark);
+      box-shadow: 0 14px 30px rgba(110, 81, 54, 0.2);
+    }
+
+    .button-secondary,
+    #new-button,
+    #select-file-button {
+      flex: 1 1 160px;
+      border: 1px solid var(--line-strong);
+      background: transparent;
+      color: var(--ink);
+    }
+
+    .button-secondary:hover,
+    #new-button:hover,
+    #select-file-button:hover {
+      border-color: var(--accent);
+      background: rgba(155, 118, 80, 0.06);
+      color: var(--accent-dark);
+    }
+
+    /* =========================================================
+       RESULTS
+       ========================================================= */
+
+    #result {
+      margin: 24px 28px 28px;
+    }
+
+    #result:not(:empty) {
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: var(--canvas-soft);
+    }
+
+    .result-status {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      font-size: 0.88rem;
+      font-weight: 600;
+    }
+
+    .ok {
+      color: var(--success);
+    }
+
+    .err {
+      color: var(--danger);
+    }
+
+    .processing {
+      color: var(--ink-soft);
+      font-family: var(--serif);
+      font-size: 1.2rem;
+      font-style: italic;
+    }
+
+    .hashbox {
+      padding: 18px;
+      overflow-wrap: anywhere;
+      border-radius: var(--radius-sm);
+
+      background:
+        radial-gradient(circle at top right, rgba(199,168,126,.12), transparent 12rem),
+        #151817;
+
+      color: #efe8dc;
+      font-family: var(--mono);
+      font-size: clamp(0.72rem, 2vw, 0.9rem);
+      line-height: 1.8;
+      letter-spacing: 0.03em;
+    }
+
+    .result-actions {
+      margin-top: 16px;
+    }
+
+    .result-actions button {
+      flex: 1 1 180px;
+    }
+
+    /* =========================================================
+       INFORMATION PANEL
+       ========================================================= */
+
+    .info {
+      background: #171a19;
+      color: #f5f0e6;
+    }
+
+    .info::before {
+      background: linear-gradient(
+        90deg,
+        var(--accent-light),
+        transparent
+      );
+    }
+
+    .info-header {
+      padding: 34px 28px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .info-header .section-label {
+      color: var(--accent-light);
+    }
+
+    .info-header h2 {
+      margin: 0;
+      font-family: var(--serif);
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 500;
+      letter-spacing: -0.045em;
+      line-height: 1.02;
+    }
+
+    .info-grid {
+      display: grid;
+    }
+
+    .info-item {
+      padding: 25px 28px;
+      border-bottom: 1px solid rgba(255,255,255,0.09);
+    }
+
+    .info-item:last-child {
+      border-bottom: 0;
+    }
+
+    .info-item h3 {
+      margin: 0 0 9px;
+      color: var(--accent-light);
+      font-family: var(--mono);
+      font-size: 0.64rem;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .info-item p {
+      margin: 0;
+      color: rgba(245,240,230,0.68);
+      font-size: 0.9rem;
+      line-height: 1.75;
+    }
+
+    /* =========================================================
+       FOOTER
+       ========================================================= */
+
+    footer {
+      margin: 0 -20px;
+      padding: 70px 20px 28px;
+      color: #eee8dc;
+      background: #101211;
+    }
+
+    .footer-inner {
+      width: min(100%, 1400px);
+      margin: 0 auto;
+    }
+
+    .footer-top {
+      display: grid;
+      gap: 42px;
+      padding-bottom: 46px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .footer-brand {
+      margin-bottom: 14px;
+      font-family: var(--serif);
+      font-size: clamp(1.7rem, 4vw, 2.4rem);
+      letter-spacing: -0.04em;
+    }
+
+    .footer-meta {
+      max-width: 520px;
+      color: rgba(238,232,220,0.56);
+      font-size: 0.85rem;
+      line-height: 1.8;
+    }
+
+    .footer-contact {
+      display: grid;
+      gap: 12px;
+    }
+
+    .footer-contact-title,
+    .footer-tech {
+      color: var(--accent-light);
+      font-family: var(--mono);
+      font-size: 0.64rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .footer-links {
+      display: grid;
+      gap: 10px;
+    }
+
+    .footer-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+
+      padding: 16px 18px;
+
+      border: 1px solid rgba(255,255,255,0.11);
+      border-radius: var(--radius-sm);
+
+      text-decoration: none;
+
+      transition:
+        border-color 220ms var(--ease),
+        background 220ms var(--ease),
+        transform 220ms var(--ease);
+    }
+
+    .footer-link:hover {
+      transform: translateX(4px);
+      border-color: rgba(199,168,126,0.6);
+      background: rgba(255,255,255,0.04);
+    }
+
+    .footer-link-label {
+      color: rgba(238,232,220,0.48);
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .footer-link-value {
+      color: #f4eee2;
+      font-size: 0.82rem;
+      text-align: right;
+      overflow-wrap: anywhere;
+    }
+
+    .footer-link-value.mono {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+    }
+
+    .footer-bottom {
+      display: grid;
+      gap: 16px;
+      padding-top: 24px;
+    }
+
+    .footer-grid {
+      display: contents;
+    }
+
+    .footer-tech {
+      color: rgba(238,232,220,0.45);
+      line-height: 1.7;
+    }
+
+    .footer-year {
+      color: rgba(238,232,220,0.42);
+      font-size: 0.72rem;
+    }
+
+    /* =========================================================
+       RESPONSIVE
+       ========================================================= */
+
+    @media (min-width: 640px) {
+      .site-shell {
+        padding-right: 32px;
+        padding-left: 32px;
+      }
+
+      footer {
+        margin-right: -32px;
+        margin-left: -32px;
+        padding-right: 32px;
+        padding-left: 32px;
+      }
+
+      .file-zone {
+        grid-template-columns: 1fr auto;
+        align-items: center;
+      }
+
+      .footer-top {
+        grid-template-columns: minmax(0, 1fr) minmax(340px, 0.8fr);
+        align-items: start;
+      }
+
+      .footer-bottom {
+        grid-template-columns: 1fr auto;
+        align-items: center;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .site-shell {
+        padding-right: 48px;
+        padding-left: 48px;
+      }
+
+      footer {
+        margin-right: -48px;
+        margin-left: -48px;
+        padding-right: 48px;
+        padding-left: 48px;
+      }
+
+      .site-header {
+        padding-top: 34px;
+      }
+
+      .workspace {
+        grid-template-columns: minmax(0, 1.18fr) minmax(350px, 0.82fr);
+        align-items: start;
+      }
+
+      .info {
+        position: sticky;
+        top: 24px;
+      }
+
+      .info-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .info-item:nth-child(odd) {
+        border-right: 1px solid rgba(255,255,255,0.09);
+      }
+    }
+
+    @media (max-width: 520px) {
+      body {
+        background:
+          linear-gradient(180deg, #161918 0 23rem, var(--canvas) 23rem 100%);
+      }
+
+      .site-header {
+        align-items: flex-start;
+      }
+
+      .header-meta {
+        display: none;
+      }
+
+      .hero {
+        padding-top: 28px;
+        padding-bottom: 100px;
+      }
+
+      .hero-title {
+        font-size: clamp(3.4rem, 18vw, 5rem);
+      }
+
+      .panel-header,
+      .input-area,
+      .info-header,
+      .info-item {
+        padding-right: 20px;
+        padding-left: 20px;
+      }
+
+      .button-row {
+        padding-right: 20px;
+        padding-left: 20px;
+      }
+
+      #result {
+        margin-right: 20px;
+        margin-left: 20px;
+      }
+
+      .button-row button,
+      .result-actions button {
+        width: 100%;
+        flex-basis: 100%;
+      }
+
+      .footer-link {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .footer-link-value {
+        text-align: left;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="site-shell">
+
+    <header class="site-header">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">N</div>
+
+        <div class="brand-copy">
+          <div class="brand-name">NVO987</div>
+          <div class="brand-subtitle">Digital Integrity</div>
+        </div>
+      </div>
+
+      <div class="header-meta">SHA-256 · Local Utility</div>
+    </header>
+
+    <section class="hero" aria-labelledby="page-title">
+      <div class="eyebrow">Verification Instrument</div>
+
+      <div class="hero-grid">
+        <div>
+          <h1 id="page-title" class="hero-title">
+            SHA-256<br>
+            <em>Generator.</em>
+          </h1>
+
+          <p class="hero-description">
+            A refined local utility for generating SHA-256 hashes directly
+            within your browser. Your content remains under your control.
+          </p>
+        </div>
+      </div>
+
+      <div class="hero-rule"></div>
+    </section>
+
+    <section class="workspace">
+
+      <section class="panel tool-panel" aria-labelledby="tool-title">
+
+        <div class="panel-header">
+          <div>
+            <p class="section-label">Input &amp; Verification</p>
+            <h2 id="tool-title" class="panel-title">Generate a secure hash</h2>
+          </div>
+        </div>
+
+        <div class="input-area">
+
+          <textarea
+            id="text"
+            aria-label="Text to hash"
+            placeholder="Enter text (UTF-8 encoded)"
+          ></textarea>
+
+          <div class="divider-label">or</div>
+
+          <div class="file-zone">
+
+            <div class="file-zone-copy">
+              <div class="file-zone-title">Select a file</div>
+
+              <div class="file-zone-description">
+                Hash raw binary data locally. Maximum file size: 50 MB.
+              </div>
+            </div>
+
+            <input
+              type="file"
+              id="file"
+              hidden
+            >
+
+            <button
+              id="select-file-button"
+              type="button"
+              onclick="document.getElementById('file').click()"
+            >
+              Select File
+            </button>
+
+          </div>
+
+          <div id="filename" aria-live="polite"></div>
+
+        </div>
+
+        <div class="button-row">
+
+          <button
+            id="generate-button"
+            class="button-primary"
+            type="button"
+            onclick="generate()"
+          >
+            Generate Hash
+          </button>
+
+          <button
+            id="new-button"
+            class="button-secondary"
+            type="button"
+            onclick="resetTool()"
+          >
+            New
+          </button>
+
+        </div>
+
+        <div
+          id="result"
+          aria-live="polite"
+          aria-atomic="true"
+        ></div>
+
+      </section>
+
+      <aside class="panel info" aria-label="Tool information">
+
+        <div class="info-header">
+          <p class="section-label">Technical Notes</p>
+          <h2>Designed for clarity, privacy, and local control.</h2>
+        </div>
+
+        <div class="info-grid">
+
+          <article class="info-item">
+            <h3>Input</h3>
+            <p>
+              Text or File. Features include SHA-256 hashing, ZIP export,
+              and manifest generation.
+            </p>
+          </article>
+
+          <article class="info-item">
+            <h3>Important</h3>
+            <p>
+              Text input is encoded as UTF-8. File hashing is performed on
+              raw binary data. Results may differ for the same visible content.
+            </p>
+          </article>
+
+          <article class="info-item">
+            <h3>Info</h3>
+            <p>
+              All processing is performed locally in your browser. No input
+              data is transmitted, uploaded, stored, or shared.
+            </p>
+          </article>
+
+          <article class="info-item">
+            <h3>Privacy</h3>
+            <p>
+              This tool does not collect personal data and does not use cookies
+              or tracking technologies.
+            </p>
+          </article>
+
+          <article class="info-item">
+            <h3>Notice</h3>
+            <p>
+              This tool uses JSZip under the MIT License.
+            </p>
+          </article>
+
+          <article class="info-item">
+            <h3>Disclaimer</h3>
+            <p>
+              This software is provided "AS IS" without warranty of any kind.
+              Users are responsible for all content processed using this utility.
+            </p>
+          </article>
+
+        </div>
+
+      </aside>
+
+    </section>
+
+  </main>
+
+  <footer>
+
+    <div class="footer-inner">
+
+      <div class="footer-top">
+
+        <div>
+          <div class="footer-brand">© 2026 — NVO987</div>
+
+          <div class="footer-meta">
+            SHA256 Utility Tool · Version 1.0<br>
+            A local-first instrument for digital integrity and verification.
+          </div>
+        </div>
+
+        <div class="footer-contact">
+
+          <div class="footer-contact-title">
+            NVO987 Digital Identity
+          </div>
+
+          <div class="footer-links">
+
+            <a
+              class="footer-link"
+              href="mailto:nvo@nvo987.us"
+              aria-label="Email NVO987"
+            >
+              <span class="footer-link-label">Email</span>
+              <span class="footer-link-value">nvo@nvo987.us</span>
+            </a>
+
+            <a
+              class="footer-link"
+              href="https://identity.nvo987.us"
+              target="_blank"
+              rel="me noopener noreferrer"
+              aria-label="Open NVO987 DID identity"
+            >
+              <span class="footer-link-label">DID Identity</span>
+              <code class="footer-link-value mono">
+                did:web:identity.nvo987.us
+              </code>
+            </a>
+
+            <a
+              class="footer-link"
+              href="https://www.nvo987.us"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Visit NVO987 website"
+            >
+              <span class="footer-link-label">Website</span>
+              <span class="footer-link-value">www.nvo987.us</span>
+            </a>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="footer-bottom">
+
+        <div class="footer-year">
+          Independent local processing · Browser-based verification
+        </div>
+
+        <div class="footer-tech">
+          Powered by Web Crypto API &amp; JSZip
+        </div>
+
+      </div>
+
+    </div>
+
+  </footer>
+
+  <script>
+    let currentHash = "";
+    let currentContent = "";
+    let currentFileName = "";
+    let currentFile = null;
+
+    document.getElementById("file").addEventListener("change", e => {
+      const file = e.target.files[0];
+
+      document.getElementById("result").innerHTML = "";
+
+      if (file && file.size > 50 * 1024 * 1024) {
+        alert("File too large (max 50 MB)");
+        e.target.value = "";
+        return;
+      }
+
+      document.getElementById("filename").innerText =
+        file ? file.name : "";
+    });
+
+    async function sha256Text(text) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(text);
+
+      const hashBuffer =
+        await crypto.subtle.digest(
+          "SHA-256",
+          data
+        );
+
+      return toHex(hashBuffer);
+    }
+
+    async function sha256File(file) {
+      const buffer =
+        await file.arrayBuffer();
+
+      const hashBuffer =
+        await crypto.subtle.digest(
+          "SHA-256",
+          buffer
+        );
+
+      return toHex(hashBuffer);
+    }
+
+    function toHex(buffer) {
+      return Array
+        .from(new Uint8Array(buffer))
+        .map(b => b.toString(16).padStart(2, "0"))
+        .join("");
+    }
+
+    async function generate() {
+
+      const text =
+        document.getElementById("text").value;
+
+      const file =
+        document.getElementById("file").files[0];
+
+      const result =
+        document.getElementById("result");
+
+      if (!text && !file) {
+        result.innerHTML =
+          "<div class='result-status err'>No input provided</div>";
+        return;
+      }
+
+      result.innerHTML =
+        "<div class='processing'>Processing your input locally…</div>";
+
+      let hash = "";
+
+      try {
+
+        if (file) {
+          currentFile = file;
+          currentContent = "";
+          currentFileName = file.name;
+
+          hash = await sha256File(file);
+
+        } else {
+          currentFile = null;
+          currentFileName = "input.txt";
+          currentContent = text;
+
+          hash = await sha256Text(text);
+        }
+
+        currentHash = hash;
+
+        result.innerHTML = `
+          <div class="result-status ok">
+            SHA-256 generated successfully
+          </div>
+
+          <div class="hashbox">${hash}</div>
+
+          <div class="result-actions">
+
+            <button
+              type="button"
+              class="button-secondary"
+              onclick="copyHash()"
+            >
+              Copy Hash
+            </button>
+
+            <button
+              type="button"
+              class="button-primary"
+              onclick="downloadZIP()"
+            >
+              Download ZIP
+            </button>
+
+          </div>
+        `;
+
+      } catch (error) {
+
+        result.innerHTML =
+          "<div class='result-status err'>Unable to generate the hash.</div>";
+
+        console.error(error);
+      }
+    }
+
+    async function copyHash() {
+
+      if (!currentHash) return;
+
+      try {
+        await navigator.clipboard.writeText(
+          currentHash
+        );
+
+        alert("Hash copied.");
+
+      } catch (err) {
+        alert("Copy failed.");
+      }
+    }
+
+    function resetTool() {
+
+      currentHash = "";
+      currentContent = "";
+      currentFileName = "";
+      currentFile = null;
+
+      document.getElementById("text").value = "";
+      document.getElementById("file").value = "";
+      document.getElementById("filename").innerText = "";
+      document.getElementById("result").innerHTML = "";
+    }
+
+    async function downloadZIP() {
+
+      if (!currentHash) {
+        alert("No hash generated.");
+        return;
+      }
+
+      const zip = new JSZip();
+
+      zip.file(
+        "sha256.txt",
+        currentHash
+      );
+
+      const manifest =
+`Algorithm: SHA-256
+Filename: ${currentFileName}
+Hash: ${currentHash}
+Generated: ${new Date().toISOString()}
+`;
+
+      zip.file(
+        "manifest.txt",
+        manifest
+      );
+
+      if (currentFile) {
+
+        zip.file(
+          currentFile.name,
+          currentFile
+        );
+
+      } else {
+
+        zip.file(
+          currentFileName,
+          currentContent
+        );
+      }
+
+      const blob =
+        await zip.generateAsync({
+          type: "blob"
+        });
+
+      const a =
+        document.createElement("a");
+
+      a.href =
+        URL.createObjectURL(blob);
+
+      a.download =
+        "sha256_bundle.zip";
+
+      document.body.appendChild(a);
+
+      a.click();
+
+      document.body.removeChild(a);
+
+      setTimeout(() => {
+        URL.revokeObjectURL(a.href);
+      }, 1000);
+    }
+  </script>
+
+</body>
+    </html>
