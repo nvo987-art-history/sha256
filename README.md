@@ -1,1 +1,1 @@
-NVO987 – Culture Visuelle Moderne et Contemporaine
+NVO987 - Nicholas Van-Orton 
